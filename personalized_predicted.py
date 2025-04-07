@@ -1,10 +1,9 @@
-# %%
 import streamlit as st
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import Ridge
 
-# %%
+
 # ---------- 模拟训练好的 Ridge 模型（你可以替换成你自己的模型）----------
 # 下面这组参数来自你的报告中 HR 的 ridge 回归模型
 def predict_hr(age, weight, height, temperature, humidity):
@@ -30,28 +29,28 @@ def predict_vo2max_female(age, weight, height, temperature, humidity):
     intercept = -2785.38
     return intercept + 27.80 * temperature + 2.06 * humidity + 2.74 * age + 20.40 * weight + 20.09 * height
 
-# %%
+
 # ---------- Streamlit 页面配置 ----------
 st.set_page_config(page_title="Athlete Performance Predictor", layout="centered")
 
-st.title("🏃 Personalized Athlete Performance Predictor")
-st.write("输入你的身体参数和环境条件，预测你在高强度运动下的表现")
+st.title("🏃 Athlete Performance Predictor")
+st.markdown("Enter your personal and environmental parameters to predict your performance during high-intensity exercise.")
 
 # ---------- 用户输入 ----------
 col1, col2 = st.columns(2)
 with col1:
-    age = st.slider("年龄 (岁)", 10, 80, 25)
-    sex = st.selectbox("性别", ("男", "女"))
-    weight = st.slider("体重 (kg)", 30.0, 120.0, 70.0)
+    age = st.slider("Age (years)", 10, 80, 25)
+    sex = st.selectbox("Sex", ("Male", "Female"))
+    weight = st.slider("Weight (kg)", 30.0, 120.0, 70.0)
 with col2:
-    height = st.slider("身高 (cm)", 140.0, 200.0, 175.0)
-    temperature = st.slider("环境温度 (℃)", 15.0, 35.0, 25.0)
-    humidity = st.slider("环境湿度 (%)", 20.0, 90.0, 50.0)
+    height = st.slider("Height (cm)", 140.0, 200.0, 175.0)
+    temperature = st.slider("Ambient Temperature (°C)", 15.0, 35.0, 25.0)
+    humidity = st.slider("Humidity (%)", 20.0, 90.0, 50.0)
 
 # ---------- 计算 ----------
 hr = predict_hr(age, weight, height, temperature, humidity)
 rr = predict_rr(age, weight, height, temperature, humidity)
-vo2max = predict_vo2max_male(age, weight, height, temperature, humidity) if sex == "男" else predict_vo2max_female(age, weight, height, temperature, humidity)
+vo2max = predict_vo2max_male(age, weight, height, temperature, humidity) if sex == "Male" else predict_vo2max_female(age, weight, height, temperature, humidity)
 
 # Anaerobic threshold
 max_hr = 220 - age
@@ -59,18 +58,18 @@ anaerobic_threshold = 0.8 * max_hr
 in_anaerobic_zone = hr > anaerobic_threshold
 
 # ---------- 显示结果 ----------
-st.subheader("🔍 预测结果")
-st.write(f"**预测最大心率（HR）**: {hr:.1f} bpm")
-st.write(f"**预测呼吸频率（RR）**: {rr:.1f} 次/分钟")
-st.write(f"**预测最大摄氧量（VO2max）**: {vo2max:.1f} mL/min")
+st.subheader("🔍 Predicted Performance Metrics")
+st.write(f"**Predicted Heart Rate (HR):** {hr:.1f} bpm")
+st.write(f"**Predicted Respiratory Rate (RR):** {rr:.1f} breaths/min")
+st.write(f"**Predicted VO₂max:** {vo2max:.1f} mL/min")
 
 if in_anaerobic_zone:
-    st.markdown("🟥 **已进入无氧区间！请注意强度控制**")
+    st.markdown("🟥 **Warning: Anaerobic zone reached!** Monitor training intensity closely.")
 else:
-    st.markdown("🟩 **尚未进入无氧区间**")
+    st.markdown("🟩 **Safe zone: Below anaerobic threshold.**")
 
 # ---------- 附加说明 ----------
 st.markdown("---")
-st.markdown("📘 模型基于 Ridge Regression，数据源自 PhysioNet Treadmill Dataset 中高强度训练下的表现回归模型。")
+st.markdown("📘 This tool uses Ridge Regression models trained on the PhysioNet Treadmill Exercise Dataset. It predicts high-intensity performance responses based on personal and environmental parameters.")
 
 
